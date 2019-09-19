@@ -1,0 +1,6 @@
+<!-- collin gros, used ant.apache.org example buildfile -->
+<project name="project" default="compile" basedir=".">
+	<target name="compile">
+		<javac srcdir="." destdir="."/>
+	</target>
+</project>
