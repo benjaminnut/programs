@@ -51,9 +51,10 @@ public class WebWorker implements Runnable
 	   try {
 	      InputStream  is = socket.getInputStream();
 	      OutputStream os = socket.getOutputStream();
-	      String pathName = readHTTPRequest(is);
-	      writeHTTPHeader(os,"text/html", pathName);
-	      writeContent(os, pathName);
+	      String pathName = ret_arr[0];
+	      String contentType = ret_arr[1]
+	      writeHTTPHeader(os, contentType, pathName);
+	      writeContent(os, contentType, pathName);
 	      os.flush();
 	      socket.close();
 	   } catch (Exception e) {
@@ -66,7 +67,7 @@ public class WebWorker implements Runnable
 	* Read the HTTP request header.
 	**/
 	// returns the filepath requested from the user
-	private String readHTTPRequest(InputStream is)
+	private String[] readHTTPRequest(InputStream is)
 	{
 	   String line;
 	   String pathName = "";
@@ -94,14 +95,31 @@ public class WebWorker implements Runnable
 	   // if pathName is blank
 	   if (pathName.equals("./"))
 	      pathName = pathName + "home.html";
+	  	//try and find the appropriate content type from path
+	  	String contentType = "text/html";
+		if (filepath.contains(".gif")) {
+		    contentType = "image/gif";
+		}
+		else if (filepath.contains(".jpeg")) {
+		    contentType = "image/jpeg";
+		}
+		else if (filepath.contains(".png")) {
+		    contentType = "image/png";
+		}
+		else if (filepath.contains(".ico")) {
+      		contentType = "image/x-icon";
+  		}
+
 	   // if the file at filepath doesn't exist
 	   try {
 	      BufferedReader br = new BufferedReader(new FileReader(pathName));
 	   }
 	   catch (Exception e) {
-	      return "";
+	      String ret_arr = {"","text/html"}
+	      return ret_arr;
 	   }
-	   return pathName;
+	   String[] ret_arr = {pathName, contentType};
+	   return ret_arr;
 	}
 	/**
 	* Write the HTTP header lines to the client network connection.
@@ -136,13 +154,27 @@ public class WebWorker implements Runnable
 	* be done after the HTTP header has been written out.
 	* @param os is the OutputStream object to write to
 	**/
-	private void writeContent(OutputStream os, String pathName) throws Exception
+	private void writeContent(OutputStream os, String pathName, String contentType) throws Exception
 	{
 	   String sname = "Ben's Server";
 	   // if file at pathName wasn't found
 	   if (pathName == "") {
 	      pathName = "./404.html";
 	   }
+
+	   if (contentType.contains("image/")){
+	   	InputStream is = new FileInputStream(pathName);
+	   	int readBytes;
+	   	while (true){
+	   		readBytes = is.read();
+	   		if(readBytes == -1)
+	   			break;
+	   		os.write(readBytes);
+	   	}
+	   }
+
+	   else if (contentType == "text/html"){
+
 	   // reading the html file at pathName
 	   BufferedReader br = new BufferedReader(new FileReader(pathName));
 	   String line;
@@ -164,7 +196,8 @@ public class WebWorker implements Runnable
 	      }
 	      else {
 	         os.write((line + "\n").getBytes());
-	    }
+	    	}
+		}
 	  }
 	}
 } // end class

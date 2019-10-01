@@ -1,6 +1,15 @@
-<!-- collin gros, used ant.apache.org example buildfile -->
-<project name="project" default="compile" basedir=".">
-	<target name="compile">
-		<javac srcdir="." destdir="."/>
+<!-- Ben Nutter, used ant.apache.org example buildfile -->
+<project name="project" default="run" basedir=".">
+	<target name="run">
+		<delete dir="./build"/>
+		<mkdir dir="./build/classes"/>
+		<javac srcdir="./src" destdir="./build/classes"/>
+		<mkdir dir="./build/jar"/>
+		<jar destfile="./build/jar/WebServer.jar" basedir="./build/classes">
+			<manifest>
+				<attribute name="Main-Class" value="WebServer"/>
+			</manifest>
+		</jar>
+		<java jar="./build/jar/WebServer.jar" fork="true"/>
 	</target>
 </project>
