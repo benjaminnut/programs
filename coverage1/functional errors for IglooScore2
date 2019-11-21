@@ -1,0 +1,4 @@
+functional errors for valid input: 
+
+line 44 needs to have s2 = score3, not score 2. 
+lines 74 and 75: needs to be s1 = score1, s2 = score 2, as opposed to 99 and 99 respectively. 
